@@ -1,0 +1,151 @@
+/* 5/2/2021
+   Abrar Khan
+   This program is made to help Chipotle employees track their revenues from orders on a daily basis.
+   It allows them to input orders and progressively tracks the revenue growth. 
+*/
+
+import java.util.Scanner;
+import java.util.Date;
+
+public class ChipotleServices {
+
+    //Create a static integer variable to keep track of the number of orders completed
+    static int orderCount = 0;
+    //Create a static revenue variable to keep track of total revenue generated
+    static double totalRevenue = 0;
+    //Create two static double variables to keep track of total pickup revenue and total delivery revenue generated
+    static double pickupTotal = 0;
+    static double deliveryTotal = 0;
+    //final double variable to represent the sales tax in Virginia as a percentage
+    public final static double salesTax = 5.3;
+
+    public static void main(String[] args) {
+        //Create an array of size 25 that will hold all 25 items on the menu and set all elements in the array equal to
+        //a MenuItem object that represents each item on the menu
+        MenuItem[] menu = new MenuItem[25];
+        menu[0] = new MenuItem(1, "Barbacoa Salad", 8.00 );
+        menu[1] = new MenuItem(2, "Carnitas Salad", 7.50 );
+        menu[2] = new MenuItem(3, "Chicken Salad", 6.95 );
+        menu[3] = new MenuItem(4, "Sofritas Salad", 6.95 );
+        menu[4] = new MenuItem(5, "Steak Salad", 8.00 );
+        menu[5] = new MenuItem(6, "Veggie Salad", 6.95 );
+        menu[6] = new MenuItem(7, "Barbacoa Bowl", 8.00 );
+        menu[7] = new MenuItem(8, "Carnitas Bowl", 7.50 );
+        menu[8] = new MenuItem(9, "Chicken Bowl", 6.95 );
+        menu[9] = new MenuItem(10, "Sofritas Bowl", 6.95 );
+        menu[10] = new MenuItem(11, "Steak Bowl", 8.00 );
+        menu[11] = new MenuItem(12, "Veggie Bowl", 6.95 );
+        menu[12] = new MenuItem(13, "Barbacoa Triple Taco", 8.00 );
+        menu[13] = new MenuItem(14, "Carnitas Triple Taco", 7.50 );
+        menu[14] = new MenuItem(15, "Chicken Triple Taco", 6.95 );
+        menu[15] = new MenuItem(16, "Sofritas Triple Taco", 6.95 );
+        menu[16] = new MenuItem(17, "Steak Triple Taco", 8.00 );
+        menu[17] = new MenuItem(18, "Veggie Triple Taco", 6.95 );
+        menu[18] = new MenuItem(19, "Chips and Fresh Tomato Salsa", 2.05 );
+        menu[19] = new MenuItem(20, "Chips and Guacamole", 3.45 );
+        menu[20] = new MenuItem(21, "Chips", 1.40 );
+        menu[21] = new MenuItem(22, "Mexican Coca-Cola", 2.80 );
+        menu[22] = new MenuItem(23, "Peach Orange Juice", 2.80 );
+        menu[23] = new MenuItem(24, "San Pellegrino Sparkling", 2.65 );
+        menu[24] = new MenuItem(25, "Grapefruit Izze", 2.80 );
+
+        //Create an object from the Scanner class and an object from the Date class
+        Scanner input = new Scanner(System.in);
+        Date d = new Date();
+        //Show date and welcome
+        System.out.println(d.toString());
+        System.out.println("Welcome to Chipotle!");
+        int option;
+
+        //start do while loop and keep prompting user the options until they choose to end the program (when option == 3)
+        do {
+            System.out.println("Press 1 to start an order");
+            System.out.println("Press 2 to display Revenue statement");
+            System.out.println("Press 3 to end the program");
+            option = input.nextInt();
+            input.nextLine();
+            if(option == 1) {
+                //the menuID which will help us retrieve the correct price from the menu
+                int menuID;
+                //total cost of the order
+                double totalCost = 0;
+                //start do while loop and keep prompting user to enter menu ID until they choose to stop entering items (when menuID == 0)
+                do {
+                    System.out.println("Please enter a menu ID");
+                    System.out.println("Press 0 to stop");
+                    System.out.println("Press 26 to view menu");
+                    menuID = input.nextInt();
+                    input.nextLine();
+                    //checking to see if menuID is within the correct range of values
+                    if(menuID >= 1 && menuID <= 25) {
+                        //update totalCost to itself plus the cost of the menu item in our menu array at the menuID - 1 location
+                        //we subtract 1 because indexing starts at 0.
+                        totalCost += menu[menuID - 1].getCost();
+                    }
+                    else if (menuID == 26) {
+                        //print the menu in a nicely formatted table
+                        System.out.printf("%-10s%-30s%-30s\n","Menu ID", "Item Name", "Cost ($)");
+                        for (int i = 0; i < menu.length; i++) {
+                            System.out.printf("%-10s%-30s%-30.2f\n", menu[i].getMenuID(), menu[i].getName(), menu[i].getCost());
+                        }
+                    }
+                    else if (menuID != 0) {
+                        System.out.println("Error! Invalid menu ID, please try again");
+                    }
+                    else if (menuID == 0) {
+                        int deliveryType;
+                        //get the delivery type as an integer
+                        do {
+                            System.out.println("Press 0 for pickup and 1 for delivery.");
+                            deliveryType = input.nextInt();
+                            input.nextLine();
+                            if(deliveryType != 1 && deliveryType != 0) {
+                                System.out.println("Error! Invalid delivery type. Please try again.");
+                            }
+                        } while(deliveryType != 1 && deliveryType != 0);
+                        System.out.println("Order Complete");
+                        //if deliveryType is 0 then update totalRevenue and pickupTotal and display the total cost of the order
+                        if(deliveryType == 0) {
+                            //update total revenue as well as pickup total
+                            totalRevenue += totalCost;
+                            pickupTotal += totalCost;
+                            //display total cost of order
+                            System.out.printf("Total cost of order: $" + "%.2f\n\n", totalCost);
+                        }
+                        //if deliveryType is 1 then update totalRevenue and deliveryTotal as the total cost times 1.1 plus a 1 dollar fee
+                        //and display the total cost of the order
+                        else if (deliveryType == 1) {
+                            //update total revenue as well as delivery total
+                            totalRevenue += (totalCost * 1.1) + 1;
+                            deliveryTotal += (totalCost * 1.1) + 1;
+                            // display total cost of order
+                            System.out.printf("Total cost of order: $" + "%.2f\n\n", (totalCost * 1.1) + 1);
+                        }
+                        //increment order count at the end of each order
+                        orderCount++;
+                    }
+                } while(menuID != 0);
+            }
+            else if (option == 2) {
+                //find average order cost by dividing total revenue by number of orders.
+                double averageOrderCost = totalRevenue/orderCount;
+                //find total sales tax by taking total revenue and multiply by Virginia sales tax as a decimal.
+                double totalSalesTax = (salesTax/100)*totalRevenue;
+                //print nicely formatted summary of key measures and findings
+                System.out.println(d.toString());
+                System.out.println("Chipotle Mexican Grill, Inc., Fairfax Location Revenue Statement");
+                System.out.printf("Average Order Cost: $" + "%.2f\n", averageOrderCost);
+                System.out.printf("Total Revenue from Takeout: $" + "%.2f\n", pickupTotal);
+                System.out.printf("Total Revenue from Delivery: $" + "%.2f\n", deliveryTotal);
+                System.out.printf("Total Sales Tax: $" + "%.2f\n", totalSalesTax);
+                System.out.printf("Total Revenue: $" + "%.2f\n\n", totalRevenue);
+            }
+            else if (option == 3) {
+                System.out.println("Thank you for using Chipotle services!");
+            }
+            else {
+                System.out.println("Error! Invalid input. Please try again.");
+            }
+        } while(option != 3);
+    }
+}
